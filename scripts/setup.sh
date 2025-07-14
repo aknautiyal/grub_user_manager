@@ -17,25 +17,19 @@ sudo mkdir -p /boot/grub/custom
 sudo chmod 755 /boot/grub/custom
 echo "[✓] Created /boot/grub/custom"
 
-# Create base 40_custom if missing
+echo "[*] Overwriting 40_custom with skeleton for submenu entry"
 GRUB_FILE="/etc/grub.d/40_custom"
-if [[ ! -f "$GRUB_FILE" ]]; then
-    echo "[*] Creating /etc/grub.d/40_custom..."
-    sudo bash -c "cat > $GRUB_FILE" <<'EOF'
+sudo tee "$GRUB_FILE" > /dev/null << 'EOF'
 #!/bin/sh
 exec tail -n +3 $0
 # This file provides an easy way to add custom menu entries.
-# Simply type the menu entries you want to add after this comment.
-exec tail -n +3 $0
+# Managed by grub-user-manager. Do not edit manually.
+
+submenu "User Kernels" {
+	#User entries will be inserted here
+}
 EOF
-    sudo chmod +x "$GRUB_FILE"
-    echo "[✓] Created $GRUB_FILE"
-else
-    echo "[i] $GRUB_FILE already exists"
-fi
-
-# Update GRUB once
-echo "[*] Running update-grub..."
-sudo update-grub
-
-echo "[✓] Setup complete."
+sudo chmod +x "$GRUB_FILE"
+echo "[✓] Created $GRUB_FILE"
+echo "[✓] Setup completed. You can now run bulk_setup.sh or per-user
+refresh scripts."
