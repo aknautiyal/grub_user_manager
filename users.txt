@@ -1,0 +1,14 @@
+# List of users who need GRUB boot entries
+# Each user will get a .cfg in /boot/grub/custom/
+# Uncomment names as needed, or add new ones
+
+# asha
+# bharat
+# chandan
+# deepak
+# esha
+# farhan
+# gopal
+# hema
+# indira
+# jaya
