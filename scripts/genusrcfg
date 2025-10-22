@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# gen_user_config.sh
+#
+# Generates a GRUB config fragment for a user.
+#
+# USAGE:
+#   sudo ./gen_user_config.sh <username> [kernel_deb_file]
+#
+# EXAMPLES:
+#   1. Dummy config:
+#        sudo ./gen_user_config.sh asha
+#
+#   2. With kernel .deb file:
+#        sudo ./gen_user_config.sh bharat ./linux-image-6.6.0-custom.deb
+#
+
+set -e
+echo ""
+# Ensure script is run as root
+if [[ "$EUID" -ne 0 ]]; then
+	echo "[!] Please run as root (use sudo)."
+	exit 1
+fi
+
+USER="$1"
+DEB="$2"
+
+if [[ -z "$USER" ]]; then
+	echo "Usage: $0 <username> [kernel_deb_file]"
+	exit 1
+fi
+
+CFG_PATH="/boot/grub/custom/${USER}.cfg"
+
+if [[ -f "$CFG_PATH" ]]; then
+	echo "[*] Config file for user: $USER found : $CFG_PATH"
+else
+	echo "[!] Warning: No config file for user: $USER"
+	echo ""
+	exit
+fi
+
+# Get UUID of the root device
+ROOT_PART=$(findmnt -no SOURCE /)
+UUID=$(blkid -s UUID -o value "$ROOT_PART")
+
+# If .deb file is provided, extract version and construct kernel/initrd paths
+if [[ -n "$DEB" ]]; then
+	echo "[*] Extracting kernel version from .deb file: $DEB"
+	VERSION=$(dpkg-deb -c "$DEB" | awk '{print $6}' | grep 'boot/vmlinuz-' | sed 's|.*/vmlinuz-||' | head -n1)
+
+	KERNEL="vmlinuz-$VERSION"
+	INITRD="initrd.img-$VERSION"
+	echo "[*] Using extracted kernel: $KERNEL"
+	echo "[*] Using extracted initrd: $INITRD"
+
+# Fallback to dummy values if nothing provided
+else
+	KERNEL="vmlinuz-dummy"
+	INITRD="initrd.img-dummy"
+	VERSION=dummy
+	echo "[*] Using dummy values: $KERNEL and $INITRD"
+fi
+
+# Output Config
+echo ""
+echo "###############################################################"
+echo "** Add below to $CFG_PATH **"
+echo ""
+echo "# GRUB config for ${USER}"
+echo "# Root UUID: ${UUID}"
+echo ""
+echo "menuentry \"${USER}: ${VERSION}\" {"
+echo "	echo \"Loading ${USER} ${VERSION}\""
+echo "	linux /boot/${KERNEL} root=UUID=${UUID} ro quiet 3 splash drm.debug=0xe"
+echo "	initrd /boot/${INITRD}"
+echo "}"
+echo ""
+echo "To boot this once Use:"
+echo "sudo grub-reboot \"User Kernels>$USER: $VERSION\""
+echo "sudo reboot"
+echo "###############################################################"
+echo ""

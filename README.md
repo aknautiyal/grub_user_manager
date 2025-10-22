@@ -12,6 +12,7 @@ This project allows multiple users to manage and boot their own custom kernel co
 │   ├── setup.sh			# One-time setup script
 │   ├── bulk_setup.sh			# Generate + add configs for all users
 │   ├── gen_user_config.sh		# Generate per-user GRUB config
+│   ├── genusrcfg			# Utility to generate menu entry for given deb file
 │   ├── add_user_to_40_custom.sh	# Append user config source to 40_custom
 │   ├── remove_user_from_40_custom.sh	# Remove a user's block from 40_custom
 │   └── cleanup.sh			# Optional cleanup script
@@ -125,6 +126,13 @@ menuentry "asha: kernel-2" {
 
 - `cleanup.sh`
   → Remove all generated user configs and reset `40_custom`.
+
+- `genusrcfg`
+```bash
+sudo genusrcfg asha linux-image.deb
+```
+
+  → Generates a new entry for the `asha.cfg` config file with given kernel image deb file. The new entry is printed on console and can be copied to the config file.
 
 ---
 
