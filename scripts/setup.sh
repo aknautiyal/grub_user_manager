@@ -36,4 +36,12 @@ fi
 # Make sure file is executable
 chmod +x "$GRUB_FILE"
 
+# Install genusrcfg script
+echo "[*] Installing genusrcfg to /usr/local/bin..."
+install -m 755 scripts/genusrcfg /usr/local/bin/genusrcfg
+echo "[✓] Installed /usr/local/bin/genusrcfg"
+
+echo "[*] Installing bash completion to /etc/bash_completion.d/..."
+install -m 644 bash_completion/genusrcfg /etc/bash_completion.d/genusrcfg
+echo "[✓] Installed completion to /etc/bash_completion.d/genusrcfg"
 echo "[✓] GRUB setup completed. Run 'bulk_setup.sh' to generate entries."

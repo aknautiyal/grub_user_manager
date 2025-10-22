@@ -1,0 +1,15 @@
+# Simple bash completion for genusrcfg - completes usernames
+
+_genusrcfg_complete() {
+    local cur
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+
+    # Get usernames by stripping .config from files
+    local users
+    users=$(basename -s .cfg /boot/grub/custom/*.cfg 2>/dev/null)
+
+    COMPREPLY=( $(compgen -W "${users}" -- "$cur") )
+}
+
+complete -F _genusrcfg_complete genusrcfg

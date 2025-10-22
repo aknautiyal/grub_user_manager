@@ -11,9 +11,32 @@ if [[ "$EUID" -ne 0 ]]; then
 	exit 1
 fi
 
+BIN_PATH="/usr/local/bin/genusrcfg"
+COMPLETION_PATH="/etc/bash_completion.d/genusrcfg"
+
 echo "[!] This will REMOVE all per-user GRUB configs and clear 'User Kernels' submenu."
 read -rp "Are you sure? [y/N] " confirm
 [[ "$confirm" != "y" && "$confirm" != "Y" ]] && exit 0
+
+echo "Cleaning up genusrcfg installation..."
+
+# Remove the genusrcfg binary if it exists
+if [ -f "$BIN_PATH" ]; then
+    echo "[*] Removing $BIN_PATH..."
+    rm -f "$BIN_PATH"
+    echo "[✓] Removed genusrcfg binary"
+else
+    echo "[!] $BIN_PATH not found, skipping"
+fi
+
+# Remove bash completion if it exists
+if [ -f "$COMPLETION_PATH" ]; then
+    echo "Removing $COMPLETION_PATH..."
+    rm -f "$COMPLETION_PATH"
+    echo "[✓] Removed bash completion"
+else
+    echo "[!] $COMPLETION_PATH not found, skipping"
+fi
 
 # Remove all user config files
 echo "[*] Deleting /boot/grub/custom/*.cfg..."
